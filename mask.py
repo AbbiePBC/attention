@@ -55,18 +55,19 @@ def get_mask_token_index(mask_token_id: Optional[int], \
     except ValueError as _: # mask_token_id not in token_list
         return None
 
-
-def get_color_for_attention_score(attention_score):
+def get_color_for_attention_score(attention_score: float) -> tuple[int, int, int]:
     """
     Return a tuple of three integers representing a shade of gray for the
     given `attention_score`. Each value should be in the range [0, 255].
     """
-    # TODO: Implement this function
-    raise NotImplementedError
+    un_normalised_score = int(attention_score * 255)
+    return (un_normalised_score, un_normalised_score, un_normalised_score)
 
 
 
-def visualize_attentions(tokens, attentions):
+#     To index into the attentions value to get a specific attention head’s values, you can do so as attentions[i][j][k], where i is the index of the attention layer, j is the index of the beam number (always 0 in our case), and k is the index of the attention head in the layer.
+
+def visualize_attentions(tokens: list[str], attentions: tuple[tf.Tensor]):
     """
     Produce a graphical representation of self-attention scores.
 
@@ -76,13 +77,14 @@ def visualize_attentions(tokens, attentions):
     include both the layer number (starting count from 1) and head number
     (starting count from 1).
     """
-    # TODO: Update this function to produce diagrams for all layers and heads.
-    generate_diagram(
-        1,
-        1,
-        tokens,
-        attentions[0][0][0]
-    )
+    for layer_number in range(len(attentions)):
+        for head_number in range(len(attentions[layer_number][0])):
+            generate_diagram(
+                layer_number + 1,
+                head_number + 1,
+                tokens,
+                attentions[layer_number][0][head_number]
+            )
 
 
 def generate_diagram(layer_number, head_number, tokens, attention_weights):
