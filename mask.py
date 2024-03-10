@@ -1,8 +1,9 @@
 import sys
+from typing import Optional
 import tensorflow as tf
 
 from PIL import Image, ImageDraw, ImageFont
-from transformers import AutoTokenizer, TFBertForMaskedLM
+from transformers import AutoTokenizer, TFBertForMaskedLM, BatchEncoding
 
 # Pre-trained masked language model
 MODEL = "bert-base-uncased"
@@ -39,15 +40,20 @@ def main():
     # Visualize attentions
     visualize_attentions(inputs.tokens(), result.attentions)
 
-
-def get_mask_token_index(mask_token_id, inputs):
+def get_mask_token_index(mask_token_id: Optional[int], \
+                         inputs: BatchEncoding) -> Optional[int]:
     """
     Return the index of the token with the specified `mask_token_id`, or
     `None` if not present in the `inputs`.
     """
-    # TODO: Implement this function
-    raise NotImplementedError
-
+    if not mask_token_id:
+        return None
+    try:
+        token_list = inputs['input_ids'].numpy().flatten().tolist()
+        print(token_list, mask_token_id)
+        return token_list.index(mask_token_id)
+    except ValueError as _: # mask_token_id not in token_list
+        return None
 
 
 def get_color_for_attention_score(attention_score):
